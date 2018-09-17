@@ -1,0 +1,236 @@
+<!doctype>
+<html>
+<head>
+    <script src="../js/utils.js"></script>
+    <script src="../js/others.js"></script>
+    <script src="../js/Vector.js"></script>
+    <script src="../js/ship.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #eee;
+        }
+
+        #canvas {
+            width: 1224px;
+            height: 640px;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="1224" height="640" style="float: left;margin-left: 2%"></canvas>
+</body>
+</html>
+<script>
+
+
+    var segments = [
+
+        // Border
+        {a: {x: 0, y: 0}, b: {x: 1224, y: 0}},
+        {a: {x: 1224, y: 0}, b: {x: 1224, y: 640}},
+        {a: {x: 1224, y: 640}, b: {x: 0, y: 640}},
+        {a: {x: 0, y: 640}, b: {x: 0, y: 0}},
+
+        // Polygon #1
+        {a: {x: 100, y: 150}, b: {x: 120, y: 50}},
+        {a: {x: 120, y: 50}, b: {x: 200, y: 80}},
+        {a: {x: 200, y: 80}, b: {x: 140, y: 210}},
+        {a: {x: 140, y: 210}, b: {x: 100, y: 150}},
+
+        // Polygon #2
+        {a: {x: 100, y: 200}, b: {x: 120, y: 250}},
+        {a: {x: 120, y: 250}, b: {x: 60, y: 300}},
+        {a: {x: 60, y: 300}, b: {x: 100, y: 200}},
+
+        // Polygon #3
+        {a: {x: 200, y: 260}, b: {x: 220, y: 150}},
+        {a: {x: 220, y: 150}, b: {x: 300, y: 200}},
+        {a: {x: 300, y: 200}, b: {x: 350, y: 320}},
+        {a: {x: 350, y: 320}, b: {x: 200, y: 260}},
+
+        // Polygon #4
+        {a: {x: 340, y: 60}, b: {x: 360, y: 40}},
+        {a: {x: 360, y: 40}, b: {x: 370, y: 70}},
+        {a: {x: 370, y: 70}, b: {x: 340, y: 60}},
+
+        // Polygon #5
+        {a: {x: 450, y: 190}, b: {x: 560, y: 170}},
+        {a: {x: 560, y: 170}, b: {x: 540, y: 270}},
+        {a: {x: 540, y: 270}, b: {x: 430, y: 290}},
+        {a: {x: 430, y: 290}, b: {x: 450, y: 190}},
+
+        // Polygon #6
+        {a: {x: 400, y: 95}, b: {x: 580, y: 50}},
+        {a: {x: 580, y: 50}, b: {x: 480, y: 150}},
+        {a: {x: 480, y: 150}, b: {x: 400, y: 95}}
+
+    ];
+
+
+    var Segments = [];
+    for (var i = 0; i < segments.length; i++) {
+        var pa = segments[i].a;
+        var pb = segments[i].b;
+        Segments.push(new Segment(pa, pb));
+    }
+    //Segments=Segments.slice(0,4);
+    //roadSeg
+
+
+    ////////////////////////////
+    var path = [new Vector(100, 350), new Vector(250, 178), new Vector(480, 360), new Vector(670, 450), new Vector(800, 360)
+        , new Vector(1000, 600)];
+    path = [new Vector(100, 499), new Vector(150, 55),new Vector(140, 50),new Vector(300, 100),new Vector(350, 180),new Vector(500, 250),new Vector(700, 50), new Vector(800, 170),new Vector(1000, 250)];
+    ////////////////////////////
+
+    var road_seg = new roadSeg('line', {x: 304, y: 345}, {x: 434, y: 434}, 50, 0);
+    var road_seg1 = new roadSeg('line', {x: 434, y: 434}, {x: 350, y: 150}, 40, 180);
+
+    var road_seg2 = new roadSeg('circle', {x: 350, y: 150}, {x: 0, y: 0}, 40, 150, 20 - 180, new Vector(1, -0.5));
+    var road_seg3 = new roadSeg('line', road_seg2.end, {x: 0, y: 0}, 40, 150, 90 - 180, new Vector(1, 0));
+    var myRoads = new Road();
+    myRoads.generateRoads(7);
+    var data = [
+        [28, 71.34341040257158, 100],
+        [26, 107.01757004396934, 200],
+        [29, 86.09627445692016, 300],
+        [25, 101.74985064299918, 400],
+        [27, 264.8115114080681, 100],
+        [29, 217.23160583716955, 200],
+        [25, 237.5967916769514, 300],
+        [28, 245.7119224159136, 400],
+        [29, 423.3847667038931, 100],
+        [27, 421.7288653496877, 200],
+        [26, 377.30171946602985, 300],
+        [25, 396.00939194517724, 400],
+        [27, 494.1390147987803, 100],
+        [29, 556.5212938588111, 200],
+        [27, 559.5289635314964, 300],
+        [27, 547.2006159741461, 400],
+        [29, 692.2906456556314, 100],
+        [29, 695.9545848651213, 200],
+        [26, 702.6874460693301, 300],
+        [29, 704.6192164666502, 400]
+    ];
+    var obstacles = [];
+    for (var i = 0; i < data.length; i++) {
+        obstacles.push(new ObstacleCircle(new Vector(data[i][1], data[i][2] + randInt(50, 100)), data[i][0]));
+    }
+    // var ship = new MyShip(WIDTH-200, HEIGHT-100, 1, '#ff00ff');
+    var ship = new MyShip(200, 500, 1, '#ff00ff');
+    var ship_2 = new MyShip(40, 40, 1, '#FFFF00');
+    ship.speed = new Vector(1, 1);
+    ship.maxForce=0.7;
+    ship.acceleration = new Vector(Math.random(), Math.random());
+    ship_2.maxSpeed = 1.5;
+    // Find intersection of RAY & SEGMENT
+
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+
+    function draw() {
+
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(120,0,122,0.5)';
+        for (var i = 0; i < path.length; i++) {
+            ctx.beginPath();
+            ctx.moveTo(path[i].x, path[i].y);
+            ctx.lineTo(path[(i + 1) % path.length].x, path[(i + 1) % path.length].y);
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+//        for(var i=0;i<obstacles.length;i++){
+//            obstacles[i].draw(ctx);
+//        }
+
+        ship.followPath(path,ctx,1);
+
+        ship.drawShip(canvas,ctx);
+        ship.recordTrace(ctx);
+        ship.move();
+//        ship.drawShip(canvas, ctx);
+        Segments = Segments.slice(0, 4);
+        var intersects = ship.rayCasting(Segments, obstacles);
+        if (intersects.length > 0)
+            ship.drawRayCasting(ctx, intersects);
+        //    ship.recordTrace(ctx);
+        if (ship_2.location.x > 0 && ship_2.location.x < 640 && ship_2.location.y > 0 && ship_2.location.y < 640) {
+            //var intersects = ship.rayCasting(Segments);
+            //var intersects = [];
+            ship_2.recordTrace(ctx);
+            //    ship_2.move();
+            //ship.arrive(ship_2.location);
+            //ship.avoidWalls();
+            //ship.flee(ship_2.location);
+            //ship.followPath(TARGETS);
+            //ship.move();
+
+//            if (intersects.length > 0)
+//                ship.drawRayCasting(ctx, intersects);
+        }
+
+        //        road_seg.draw(ctx);
+        //    road_seg1.draw(ctx);
+        //    road_seg2.draw(ctx);
+        //    myRoads.draw(ctx);
+        // Draw segments
+        /*
+         ctx.strokeStyle = "#999";
+         for (var i = 0; i < segments.length; i++) {
+         var seg = segments[i];
+         ctx.beginPath();
+         ctx.moveTo(seg.a.x, seg.a.y);
+         ctx.lineTo(seg.b.x, seg.b.y);
+         ctx.stroke();
+         }
+         */
+
+
+    }
+    var TARGETS = [new Vector(200, 200), new Vector(200, 600), new Vector(600, 600), new Vector(600, 200)];
+
+    // LINE SEGMENTS
+
+    // DRAW LOOP
+    //window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
+    var timer;
+    clearTimeout(timer);
+    window.requestAnimFrame = (function () {
+        return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    timer = window.setTimeout(callback, 1000 / 60);
+                };
+    })();
+
+
+    var updateCanvas = true;
+    function drawLoop() {
+        requestAnimationFrame(drawLoop);
+        if (updateCanvas) {
+            draw();
+            // updateCanvas = false;
+        }
+    }
+    window.onload = function () {
+        drawLoop();
+    };
+    /*
+     // MOUSE
+     var Mouse = {
+     x: canvas.width / 2,
+     y: canvas.height / 2
+     };
+
+     canvas.onmousemove = function (event) {
+     Mouse.x = event.clientX;
+     Mouse.y = event.clientY;
+     updateCanvas = true;
+     };*/
+
+</script>

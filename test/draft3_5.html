@@ -1,0 +1,269 @@
+<!doctype>
+<html>
+<head>
+    <script src="../js/Vector.js"></script>
+    <script src="../js/utils.js"></script>
+    <script src="../js/Graph.js"></script>
+    <script src="../js/others.js"></script>
+    <script src="../js/myRoas.js"></script>
+    <script src="../js/ship.js"></script>
+    <style>
+        body {
+            margin: 0;
+            background: #eee;
+        }
+
+        #canvas {
+            width: 1224px;
+            height: 640px;
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="1224" height="640" style="float: left;margin-left: 2%"></canvas>
+</body>
+</html>
+<script>
+
+
+    var segments = [
+
+        // Border
+        {a: {x: 0, y: 0}, b: {x: 1224, y: 0}},
+        {a: {x: 1224, y: 0}, b: {x: 1224, y: 640}},
+        {a: {x: 1224, y: 640}, b: {x: 0, y: 640}},
+        {a: {x: 0, y: 640}, b: {x: 0, y: 0}},
+
+        // Polygon #1
+        {a: {x: 100, y: 150}, b: {x: 120, y: 50}},
+        {a: {x: 120, y: 50}, b: {x: 200, y: 80}},
+        {a: {x: 200, y: 80}, b: {x: 140, y: 210}},
+        {a: {x: 140, y: 210}, b: {x: 100, y: 150}},
+
+        // Polygon #2
+        {a: {x: 100, y: 200}, b: {x: 120, y: 250}},
+        {a: {x: 120, y: 250}, b: {x: 60, y: 300}},
+        {a: {x: 60, y: 300}, b: {x: 100, y: 200}},
+
+        // Polygon #3
+        {a: {x: 200, y: 260}, b: {x: 220, y: 150}},
+        {a: {x: 220, y: 150}, b: {x: 300, y: 200}},
+        {a: {x: 300, y: 200}, b: {x: 350, y: 320}},
+        {a: {x: 350, y: 320}, b: {x: 200, y: 260}},
+
+        // Polygon #4
+        {a: {x: 340, y: 60}, b: {x: 360, y: 40}},
+        {a: {x: 360, y: 40}, b: {x: 370, y: 70}},
+        {a: {x: 370, y: 70}, b: {x: 340, y: 60}},
+
+        // Polygon #5
+        {a: {x: 450, y: 190}, b: {x: 560, y: 170}},
+        {a: {x: 560, y: 170}, b: {x: 540, y: 270}},
+        {a: {x: 540, y: 270}, b: {x: 430, y: 290}},
+        {a: {x: 430, y: 290}, b: {x: 450, y: 190}},
+
+        // Polygon #6
+        {a: {x: 400, y: 95}, b: {x: 580, y: 50}},
+        {a: {x: 580, y: 50}, b: {x: 480, y: 150}},
+        {a: {x: 480, y: 150}, b: {x: 400, y: 95}}
+
+    ];
+
+
+    var Segments = [];
+    for (var i = 0; i < segments.length; i++) {
+        var pa = segments[i].a;
+        var pb = segments[i].b;
+        Segments.push(new Segment(pa, pb));
+    }
+    //Segments=Segments.slice(0,4);
+    //roadSeg
+
+
+    ////////////////////////////
+    var path = [new Vector(100, 350), new Vector(250, 178), new Vector(480, 360), new Vector(670, 450), new Vector(800, 360)
+        , new Vector(1000, 600)];
+    path = [new Vector(100, 499), new Vector(300, 100),new Vector(500, 250),new Vector(700, 50), new Vector(800, 170),new Vector(1000, 250)];
+    ////////////////////////////
+    var circleList=[new Vector(100,300),new Vector(200,450),new Vector(300,200),
+        new Vector(400,250),new Vector(500,450),new Vector(600,550)];
+//    var circleList=[new Vector(100,300),new Vector(200,250),new Vector(400,250),new Vector(900,200)
+//        ,new Vector(900,500),new Vector(500,500),new Vector(200,400)];
+    var rp=new RoadPath();
+    rp.setup(circleList);
+    var rb=new roadBase('circle',20,new Vector(100,300),new Vector(300,245),new Vector(1,-2));
+    var rb1=new roadBase('line',20,new Vector(100,300),new Vector(300,245),new Vector(1,-2));
+    var road_seg = new roadSeg('line', {x: 304, y: 345}, {x: 434, y: 434}, 50, 0);
+    var road_seg1 = new roadSeg('line', {x: 434, y: 434}, {x: 350, y: 150}, 40, 180);
+
+    var road_seg2 = new roadSeg('circle', {x: 350, y: 150}, {x: 0, y: 0}, 40, 150, 20 - 180, new Vector(1, -0.5));
+    var road_seg3 = new roadSeg('line', road_seg2.end, {x: 0, y: 0}, 40, 150, 90 - 180, new Vector(1, 0));
+    var myRoads = new Road();
+    myRoads.generateRoads(7);
+    var data = [
+        [28, 71.34341040257158, 100],
+        [26, 107.01757004396934, 200],
+        [29, 86.09627445692016, 300],
+        [25, 101.74985064299918, 400],
+        [27, 264.8115114080681, 100],
+        [29, 217.23160583716955, 200],
+        [25, 237.5967916769514, 300],
+        [28, 245.7119224159136, 400],
+        [29, 423.3847667038931, 100],
+        [27, 421.7288653496877, 200],
+        [26, 377.30171946602985, 300],
+        [25, 396.00939194517724, 400],
+        [27, 494.1390147987803, 100],
+        [29, 556.5212938588111, 200],
+        [27, 559.5289635314964, 300],
+        [27, 547.2006159741461, 400],
+        [29, 692.2906456556314, 100],
+        [29, 695.9545848651213, 200],
+        [26, 702.6874460693301, 300],
+        [29, 704.6192164666502, 400]
+    ];
+    var obstacles = [];
+    for (var i = 0; i < data.length; i++) {
+        obstacles.push(new ObstacleCircle(new Vector(data[i][1], data[i][2] + randInt(50, 100)), data[i][0]));
+    }
+    // var ship = new MyShip(WIDTH-200, HEIGHT-100, 1, '#ff00ff');
+
+    //var ship_2 = new MyShip(40, 40, 1, '#FFFF00');
+    var ships=new Vehicles();
+    ships.setup(20);
+    //ship_2.maxSpeed = 1.5;
+    // Find intersection of RAY & SEGMENT
+    var TARGET={x:WIDTH/2,y:HEIGHT/2};
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var ggh=new GridGraph(WIDTH,HEIGHT,100);
+    ggh.init(obstacles);
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        //myRoads.draw(ctx);
+//        test_1(ctx);
+//        rb.draw(ctx);
+//        rb1.draw(ctx);
+//        draw_circle(ctx);
+        rp.draw(ctx);
+    }
+    var TARGETS = [new Vector(200, 200), new Vector(200, 600), new Vector(600, 600), new Vector(600, 200)];
+
+    //HANDLE EVENT
+
+
+
+
+
+
+    // LINE SEGMENTS
+
+    // DRAW LOOP
+    //window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
+    var timer;
+    clearTimeout(timer);
+    window.requestAnimFrame = (function () {
+        return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function (callback) {
+                    timer = window.setTimeout(callback, 1000 / 60);
+                };
+    })();
+
+
+    var updateCanvas = true;
+    function drawLoop() {
+        requestAnimationFrame(drawLoop);
+        if (updateCanvas) {
+            draw();
+            // updateCanvas = false;
+        }
+    }
+    window.onload = function () {
+        drawLoop();
+    };
+
+     // MOUSE
+     var Mouse = {
+     x: canvas.width / 2,
+     y: canvas.height / 2
+     };
+
+    /*
+     canvas.onmousemove = function (event) {
+     Mouse.x = event.clientX;
+     Mouse.y = event.clientY;
+     updateCanvas = true;
+     };*/
+    /*
+    canvas.onclick= function (e,g) {
+        ctx.fillStyle='rgba(199,233,122,0.2)';
+        var ex=e.offsetX,ey=e.offsetY;
+        TARGET.x=ex;
+        TARGET.y=ey;
+        ctx.beginPath();
+        ctx.arc(ex,ey,6,0,Math.PI*2,false);
+        ctx.fill();
+        ctx.closePath();
+        console.log(e.clientX+','+ e.clientY);
+    };
+    */
+    function test_1(context){
+        var pa=new Vector(150,400);
+        var pb=new Vector(650,440);
+        var m=new Vector((pa.x+pb.x)/2,(pa.y+pb.y)/2);
+        var ab=pa.minus(pb);
+        var d1=ab.getNormal();
+        var dd2=new Vector(-1,-8);
+        var d2=dd2.getNormal();
+
+        var t1=(m.x*d1.y- m.y*d1.x+pa.y*d1.x-pa.x*d1.y)/(d2.x*d1.y-d1.x*d2.y);
+        var center = pa.add(d2.mul(t1));
+        var R=distance(center,pa);
+        var pc=pa.add(dd2.mul(-300));
+        var pcc=pa.add(dd2.mul(300));
+        var s=Math.atan2(pa.x-center.x,pa.y-center.y);
+        var e=Math.atan2(pb.x-center.x,pb.y-center.y);
+        s=atan2ToRadius(s);
+        e=atan2ToRadius(e);
+        context.strokeStyle='rgba(0,0,0,0.6)';
+        context.beginPath();
+        context.moveTo(pa.x,pa.y);
+        context.lineTo(pb.x,pb.y);
+        context.fillText(Math.atan2(ab.x,ab.y)/Math.PI,pa.x,pa.y);
+        context.stroke();
+        context.fillStyle='rgba(255,0,255,0.8)';
+        context.arc(m.x, m.y,2,0,Math.PI*2,false);
+        context.fill();
+        context.moveTo(m.x, m.y);
+        context.lineTo(center.x,center.y);
+        context.moveTo(pa.x, pa.y);
+        context.lineTo(center.x,center.y);
+        context.strokeStyle='#ff0000';
+//        context.moveTo(pcc.x, pcc.y);
+//        context.lineTo(pc.x,pc.y);
+//        context.fillText(center.x+','+center.y,center.x,center.y);
+        context.stroke();
+        context.closePath();
+        context.beginPath();
+        var flag=false;
+        if(s>e){
+            flag=true;
+        }
+        context.arc(center.x,center.y,R,s,e,flag);
+        context.stroke();
+        context.closePath();
+    }
+    function draw_circle(context){
+        for(var i=0;i<circleList.length-1;i++){
+            var p0=circleList[i];
+            var p1=circleList[i+1];
+            context.moveTo(p0.x,p0.y);
+            context.lineTo (p1.x,p1.y);
+        }
+        context.stroke();
+    }
+</script>
